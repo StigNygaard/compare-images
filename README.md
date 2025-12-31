@@ -2,9 +2,11 @@
 
 A simple to use webcomponent creating a slider to compare two images.
 
+![compare-images](compare-images.jpg)
+
 ## Usage
 
-Include the script module which will define the custom element *&lt;compare-images /&gt;* (The script will read the
+Include the module script which will define the custom element *&lt;compare-images /&gt;* (The script reads the
 stylesheet which should be located together with the script).
 If including the script from html, remember the *type="module"* attribute:
 
