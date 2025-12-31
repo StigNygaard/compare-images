@@ -2,7 +2,7 @@
 
 A simple to use webcomponent creating a slider to compare two images.
 
-![compare-images](compare-images.jpg)
+![compare-images](compare-images.jpg "This is a snapshot - NOT an interactive demo")
 
 ## Usage
 
