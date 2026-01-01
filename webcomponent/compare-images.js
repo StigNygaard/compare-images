@@ -126,19 +126,19 @@ class CompareImages extends HTMLElement {
         }
 
         function bindEvents() {
-            'mousedown touchstart'.split(' ').forEach(function (evt) { // pointerdown
+            ['mousedown','touchstart'].forEach(function (evt) { // pointerdown
                 getDragHandler().addEventListener(evt, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     markDragStart();
                 }, false);
             });
-            'mouseup touchend touchcancel'.split(' ').forEach(function (evt) { // pointerup/pointercancel/pointerout/pointerleave?
+            ['mouseup','touchend','touchcancel'].forEach(function (evt) { // pointerup/pointercancel/pointerout/pointerleave?
                 document.addEventListener(evt, function () {
                     markDragStop();
                 }, false);
             });
-            'mousemove touchmove'.split(' ').forEach(function (evt) { // pointermove
+            ['mousemove','touchmove'].forEach(function (evt) { // pointermove
                 getContainer().addEventListener(evt, function (e) {
                     if (isDragStart()) {
                         const moveX = evt === 'touchmove' ? e.changedTouches[0].clientX : e.clientX;
