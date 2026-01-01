@@ -1,4 +1,3 @@
-
 const scriptURI = import.meta.url;
 const LOG = false;
 
@@ -27,21 +26,15 @@ function cr(tagName, attributes = {}, ...content) {
     return element;
 }
 
-function wrap(wrapper, ...wrapIt) {
-    const [first] = wrapIt;
-    if (first instanceof Node) {
-        first.parentNode.insertBefore(wrapper, first);
-        wrapper.append(...wrapIt);
-    }
-}
-
-
+/**
+ * Class representing the <compare-images/> webcomponent.
+ */
 class CompareImages extends HTMLElement {
 
     // Fires when an instance of the element is created or updated
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
+        this.attachShadow({mode: 'open'});
     }
 
     // Fires when an instance was inserted into the document
@@ -77,14 +70,14 @@ class CompareImages extends HTMLElement {
     }
 
     #init() {
-        const skeleton = cr('div', { 'class': 'image-split' },
-            cr('slot', { 'class': 'image left', 'name': 'left' }),
-            cr('slot', { 'class': 'image right', 'name': 'right' }),
-            cr('slot', { 'class': 'unnamed' })
+        const skeleton = cr('div', {'class': 'image-split'},
+            cr('slot', {'class': 'part left', 'name': 'left'}),
+            cr('slot', {'class': 'part right', 'name': 'right'}),
+            cr('slot', {'class': 'unnamed'})
         );
         this.shadowRoot.appendChild(skeleton);
-        const leftPart = this.shadowRoot.querySelector('.image.left');
-        const rightPart = this.shadowRoot.querySelector('.image.right');
+        const leftPart = this.shadowRoot.querySelector('.part.left');
+        const rightPart = this.shadowRoot.querySelector('.part.right');
         const unnamed = this.shadowRoot.querySelector('.unnamed');
         if (leftPart.assignedElements().length === 0 && unnamed.assignedElements().length) {
             unnamed.assignedElements()[0].slot = 'left';
@@ -93,75 +86,61 @@ class CompareImages extends HTMLElement {
             unnamed.assignedElements()[0].slot = 'right';
         }
         unnamed.remove();
-        const left = leftPart.assignedElements()[0];
-        const right = rightPart.assignedElements()[0];
-        if (left && right) {
-            this.#imageSplitCurtain(this, left, right);
+        const leftImage = leftPart.assignedElements()[0];
+        const rightImage = rightPart.assignedElements()[0];
+        if (leftImage && rightImage) {
+            this.#splitOperator(this, leftImage, rightImage);
         } else {
             console.error('compare-images: Error in declaration of images to compare');
         }
     }
 
-    #imageSplitCurtain(host, left, right) { // Image-Compare
-
-        // Inspired by https://www.cssscript.com/responsive-image-comparison-slider-vanilla-javascript/
-        // (https://github.com/ArekPastuszka/before-after) by ArekPastuszka
-        // and by https://codepen.io/bamf/pen/jEpxOX by Ege Görgülü.
-        // *** Maybe I should convert it to use pointerEvents (https://youtu.be/MhUCYR9Tb9c) as an exercise ? ***
-        // Or maybe I should just take a look at https://github.com/pehaa/beerslider instead?
-        // Brug css: "touch-action: none" på hele "widget" for bedre mobile experience???
-        // Eller hvad med clip-path?
-        // The Magic of Clip Path - https://emilkowal.ski/ui/the-magic-of-clip-path
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/clip-path
+    #splitOperator(host, leftImage, rightImage) {
 
         let dragStart = false;
-        if (getRoot()) {
-            createHandler();
+        const root = host.shadowRoot;
+        const leftPart = root?.querySelector('.part.left');
+        const container = root?.querySelector('.image-split')
+        if (root) {
+            createHandle();
             bindEvents();
         }
 
-        function createHandler() {
-            const dragHandler = cr('div', {class: 'draghandler', draggable: true});
-            getRoot().querySelector('.image-split')?.appendChild(dragHandler);
+        function createHandle() {
+            container.appendChild(cr('div', {class: 'draghandle', draggable: true}));
         }
 
         function bindEvents() {
-            ['mousedown','touchstart'].forEach(function (evt) { // pointerdown
-                getDragHandler().addEventListener(evt, function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    markDragStart();
-                }, false);
-            });
-            ['mouseup','touchend','touchcancel'].forEach(function (evt) { // pointerup/pointercancel/pointerout/pointerleave?
-                document.addEventListener(evt, function () {
-                    markDragStop();
-                }, false);
-            });
-            ['mousemove','touchmove'].forEach(function (evt) { // pointermove
-                getContainer().addEventListener(evt, function (e) {
-                    if (isDragStart()) {
-                        const moveX = evt === 'touchmove' ? e.changedTouches[0].clientX : e.clientX;
-                        update(moveX);
-                    }
-                }, false);
-            })
+            function startHandler(e) { // pointerdown
+                e.preventDefault();
+                e.stopPropagation();
+                markDragStart();
+            }
+            function moveHandler(e) { // pointermove
+                if (isDragStart()) {
+                    const moveX = e.type === 'touchmove' ? e.changedTouches[0].clientX : e.clientX;
+                    update(moveX);
+                }
+            }
+            function endHandler() { // pointerup/pointercancel/pointerout/pointerleave?
+                markDragEnd();
+            }
+            const dragHandle = getDragHandle();
+            dragHandle.addEventListener('mousedown', startHandler, false);
+            dragHandle.addEventListener('touchstart', startHandler, false);
+            container.addEventListener('mousemove', moveHandler, false);
+            container.addEventListener('touchmove', moveHandler, false);
+            document.addEventListener('mouseup', endHandler, false);
+            document.addEventListener('touchend', endHandler, false);
+            document.addEventListener('touchcancel', endHandler, false);
         }
 
-        function getRoot() {
-            return host.shadowRoot;
-        }
-
-        function getContainer() {
-            return getRoot().querySelector('.image-split');
-        }
-
-        function getDragHandler() {
-            return getRoot().querySelector('.draghandler');
+        function getDragHandle() {
+            return root.querySelector('.draghandle');
         }
 
         function getPositionByOffset(offsetX) {
-            const prePosition = (offsetX - getHandlerOffsetX()) * 100 / getImagesWidth();
+            const prePosition = (offsetX - host.getBoundingClientRect().left) * 100 / container.offsetWidth;
             if (prePosition < 0) {
                 return 0;
             } else if (prePosition > 100) {
@@ -178,39 +157,23 @@ class CompareImages extends HTMLElement {
         }
 
         function updateDragHandlerPosition(position) {
-            getDragHandler().style.left = position + '%';
+            getDragHandle().style.left = position + '%';
         }
 
         function updateLeftPart(position) {
             const translateValue = 100 - position;
-            getLeftPart().style.transform = 'translate(' + (-1 * translateValue) + '%)';
-            getLeftPartImage().style.transform = 'translate(' + translateValue + '%)';
-        }
-
-        function getLeftPart() {
-            return getRoot().querySelector('.image.left');
-        }
-
-        function getLeftPartImage() {
-            return left;
-        }
-
-        function getImagesWidth() {
-            return getRoot().querySelector('.image-split').offsetWidth;
-        }
-
-        function getHandlerOffsetX() {
-            return host.getBoundingClientRect().left;
+            leftPart.style.transform = 'translate(' + (-1 * translateValue) + '%)';
+            leftImage.style.transform = 'translate(' + translateValue + '%)';
         }
 
         function markDragStart() {
             dragStart = true;
-            getDragHandler().classList.add('dragging');
+            getDragHandle().classList.add('dragging');
         }
 
-        function markDragStop() {
+        function markDragEnd() {
             dragStart = false;
-            getDragHandler().classList.remove('dragging');
+            getDragHandle().classList.remove('dragging');
         }
 
         function isDragStart() {
