@@ -2,12 +2,12 @@
 
 A webcomponent creating a "slider" to compare two images.
 
-![compare-images](compare-images.jpg "This is a snapshot - NOT an interactive demo")
+![compare-images](compare-images.jpg "This is a simple screenshot - NOT an interactive demo")
 
 ## Usage
 
 To use the [webcomponent](https://github.com/StigNygaard/image-compare/releases "releases"), include the module script
-which will define the custom element *&lt;compare-images /&gt;* (The script reads the stylesheet which should be
+which will define the custom element *&lt;compare-images/&gt;* (The script reads the stylesheet which *must* be
 located together with the script). If including the script from html, remember the *type="module"* attribute:
 
     <script src="webcomponent/compare-images.js" type="module"></script>
@@ -19,10 +19,19 @@ Now, simply wrap two equally sized images in such a custom element to create a s
       <img src="image2.jpg"> 
     </compare-images> 
 
+Optionally, you can add slot-names "left" and "right" to the images. If you for some reason want to swap the sides in
+the comparison without swapping image-order in the html-code, you can add the *slot* attribute to one or both images, like:
+
+    <compare-images> 
+      <img src="image1.jpg" slot="right"> 
+      <img src="image2.jpg"> 
+    </compare-images> 
+
+Any extra images added besides the two images used for left and right in the comparison, will be ignored.
 
 ## Implementation
 
-It is old code from my "drawer" re-packed into a simple to use modern webcomponent.
+It is old code from my "drawer" re-packed into a simple to use modern webcomponent (implementing a shadow-dom).
 The old code was originally inspired from https://www.cssscript.com/responsive-image-comparison-slider-vanilla-javascript/
 (https://github.com/ArekPastuszka/before-after) by ArekPastuszka and from https://codepen.io/bamf/pen/jEpxOX by Ege Görgülü.
 
