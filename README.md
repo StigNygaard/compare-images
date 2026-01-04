@@ -27,7 +27,14 @@ the comparison without swapping image-order in the html-code, you can add the *s
       <img src="image2.jpg"> 
     </compare-images> 
 
-Any extra images added besides the two images used for left and right in the comparison, will be ignored.
+Any extra images added besides the two images used for the comparison, will be ignored.
+
+### Defining the size
+
+Adjust the size of the "widget" (webcomponent) either by adjusting the size of the images used, or by
+controlling/restricting the *width* of the *compare-images* element. The images' aspect-radio will be preserved even
+if only defining the width. Trying to (down)scale the widget by only defining the *height* of the *compare-images*
+element, currently doesn't work correctly.
 
 ## Implementation
 

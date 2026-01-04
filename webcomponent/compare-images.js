@@ -1,3 +1,10 @@
+/**
+ *  <compare-images/> module script
+ *  Needs to be located together with the compare-images.css stylesheet.
+ *
+ *  For info or the latest version, see https://github.com/StigNygaard/image-compare
+ */
+
 const scriptURI = import.meta.url;
 const LOG = false;
 
@@ -111,12 +118,12 @@ class CompareImages extends HTMLElement {
         }
 
         function bindEvents() {
-            function startHandler(e) { // pointerdown
+            function startHandler(e) { // pointerdown?
                 e.preventDefault();
                 e.stopPropagation();
                 markDragStart();
             }
-            function moveHandler(e) { // pointermove
+            function moveHandler(e) { // pointermove?
                 if (isDragStart()) {
                     const moveX = e.type === 'touchmove' ? e.changedTouches[0].clientX : e.clientX;
                     update(moveX);
@@ -157,13 +164,13 @@ class CompareImages extends HTMLElement {
         }
 
         function updateDragHandlerPosition(position) {
-            getDragHandle().style.left = position + '%';
+            getDragHandle().style.left = `${position}%`;
         }
 
         function updateLeftPart(position) {
             const translateValue = 100 - position;
-            leftPart.style.transform = 'translate(' + (-1 * translateValue) + '%)';
-            leftImage.style.transform = 'translate(' + translateValue + '%)';
+            leftPart.style.transform = `translate(${-translateValue}%)`;
+            leftImage.style.transform = `translate(${translateValue}%)`;
         }
 
         function markDragStart() {
