@@ -1,4 +1,4 @@
-# Compare Images Slider Webcomponent
+# <compare-images/> webcomponent
 
 A webcomponent creating a "slider" to compare two images.
 
