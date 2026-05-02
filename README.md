@@ -36,7 +36,7 @@ controlling/restricting the *width* of the *compare-images* element. The images'
 if only defining the width. Trying to (down)scale the widget by only defining the *height* of the *compare-images*
 element, currently doesn't work correctly.
 
-## Implementation
+## About the implementation
 
 It is old code from my "drawer" re-packed into a simple to use modern webcomponent (implementing a shadow-dom).
 The old code was originally inspired from https://www.cssscript.com/responsive-image-comparison-slider-vanilla-javascript/

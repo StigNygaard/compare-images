@@ -1,0 +1,22 @@
+<compare-images/> webcomponent
+
+To use this webcomponent, place compare-images.js and compare-images.css together in the same
+location (the script will read the css file) and include the script as a module in your
+webpage/project. If including the script module from html, remember the type-attribute. Like:
+
+<script src="webcomponent/compare-images.js" type="module"></script>
+
+Now, simply wrap two equally sized images with <compare-images> to create a slider
+to compare the two images:
+
+<compare-images>
+  <img src="image1.jpg">
+  <img src="image2.jpg">
+</compare-images>
+
+For more information on use and the latest versions, see:
+https://github.com/StigNygaard/compare-images
+
+Have fun...
+
+/Stig
