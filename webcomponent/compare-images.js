@@ -2,7 +2,7 @@
  *  <compare-images/> module script
  *  Needs to be located together with the compare-images.css stylesheet.
  *
- *  For info or the latest version, see https://github.com/StigNygaard/image-compare
+ *  For info or the latest version, see https://github.com/StigNygaard/compare-images
  */
 
 const scriptURI = import.meta.url;

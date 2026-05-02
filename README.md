@@ -6,7 +6,7 @@ A webcomponent creating a "slider" to compare two images.
 
 ## Usage
 
-To use the [webcomponent](https://github.com/StigNygaard/image-compare/releases "releases"), include the module script
+To use the [webcomponent](https://github.com/StigNygaard/compare-images/releases "releases"), include the module script
 which will define the custom element *&lt;compare-images/&gt;* (The script reads the stylesheet which *must* be
 located together with the script). If including the script from html, remember the *type="module"* attribute:
 
