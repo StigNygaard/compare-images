@@ -4,6 +4,8 @@ A webcomponent creating a "slider" to compare two images.
 
 ![compare-images](compare-images.jpg "This is a simple screenshot - NOT an interactive demo")
 
+See and try it in action on https://www.rockland.dk/show/?post=418-compare-images-webcomponent-soborg-so. 
+
 ## Usage
 
 To use the [webcomponent](https://github.com/StigNygaard/compare-images/releases "releases"), include the module script
@@ -38,9 +40,11 @@ element, currently doesn't work correctly.
 
 ## About the implementation
 
-It is old code from my "drawer" re-packed into a simple to use modern webcomponent (implementing a shadow-dom).
-The old code was originally inspired from https://www.cssscript.com/responsive-image-comparison-slider-vanilla-javascript/
-(https://github.com/ArekPastuszka/before-after) by ArekPastuszka and from https://codepen.io/bamf/pen/jEpxOX by Ege Görgülü.
+It is old code from my "drawer" re-packed into a simple to use modern webcomponent (implementing a
+custom html element with a shadow-dom). The old code was originally inspired from
+https://www.cssscript.com/responsive-image-comparison-slider-vanilla-javascript/
+(https://github.com/ArekPastuszka/before-after) by ArekPastuszka
+and from https://codepen.io/bamf/pen/jEpxOX by Ege Görgülü.
 
 Maybe it could be an idea to try rewriting it someday to use the more modern Pointer Events API.
 But I believe it works pretty well as it is.
