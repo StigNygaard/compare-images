@@ -46,11 +46,7 @@ class CompareImages extends HTMLElement {
 
     // Fires when an instance was inserted into the document
     connectedCallback() {
-        const cachevalue = new Date().toISOString().substring(0, 10);
         const basestyles = new URL('compare-images.css', scriptURI);
-        if (!basestyles.searchParams.get('cache')) {
-            basestyles.searchParams.set('cache', cachevalue.toString());
-        }
         this.shadowRoot.appendChild(cr('link', {rel: 'stylesheet', id: 'basestyles', href: basestyles.href}));
         this.#init();
     }

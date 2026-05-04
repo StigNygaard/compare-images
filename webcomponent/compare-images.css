@@ -68,7 +68,7 @@
     cursor: ew-resize;
     opacity: var(--inactive-handle-opacity);
     transition: opacity 0.4s ease-in-out;
-    animation: show 3000ms 2000ms ease-in-out none; /* animation 'show' is an initial hint about the drag-handle for desktop/mouse users */
+    animation: show 2000ms 2000ms ease-in-out none; /* animation 'show' is an initial hint about the drag-handle for desktop/mouse users */
 }
 @keyframes show {
     50% {
