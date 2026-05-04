@@ -56,6 +56,7 @@ class CompareImages extends HTMLElement {
         if (this.shadowRoot) {
             this.shadowRoot.replaceChildren();
         }
+        // TODO: Full "un-init" incl. removal of event listeners
     }
 
     static get observedAttributes() {
