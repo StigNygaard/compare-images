@@ -7,6 +7,7 @@
 
 :host {
     --inactive-handle-opacity: 1;
+    --split-value: 50%;
     display: block; /* By default, custom elements are "inline" */
     position: relative;
     contain: layout style; /* https://developer.chrome.com/blog/css-containment/ */
@@ -45,7 +46,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    transform: translate(-50%);
+    transform: translate(calc(var(--split-value) * -1));
 }
 .image-split ::slotted(img) {
     max-width: 100%;
@@ -53,12 +54,12 @@
     display: block;
 }
 .image-split .part.left::slotted(img) {
-    transform: translate(50%);
+    transform: translate(var(--split-value));
 }
 .image-split .draghandle {
     /* The line separator */
     position: absolute;
-    left: 50%;
+    left: calc(100% - var(--split-value));
     top: 0;
     bottom: 0;
     width: 4px;
@@ -67,7 +68,7 @@
     cursor: ew-resize;
     opacity: var(--inactive-handle-opacity);
     transition: opacity 0.4s ease-in-out;
-    animation: show 3000ms 2000ms ease-in-out none; /* animation 'show' is an initial hint about the drag-handle */
+    animation: show 3000ms 2000ms ease-in-out none; /* animation 'show' is an initial hint about the drag-handle for desktop/mouse users */
 }
 @keyframes show {
     50% {
