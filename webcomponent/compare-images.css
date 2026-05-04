@@ -67,6 +67,15 @@
     cursor: ew-resize;
     opacity: var(--inactive-handle-opacity);
     transition: opacity 0.4s ease-in-out;
+    animation: show 3000ms 2000ms ease-in-out none; /* animation 'show' is an initial hint about the drag-handle */
+}
+@keyframes show {
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: var(--inactive-handle-opacity);
+    }
 }
 
 .image-split:hover .draghandle {
