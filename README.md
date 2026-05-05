@@ -9,8 +9,8 @@ See and try it in action on https://www.rockland.dk/show/?post=418-compare-image
 ## Usage
 
 To use the [webcomponent](https://github.com/StigNygaard/compare-images/releases "releases"), include the module script
-which will define the custom element *&lt;compare-images/&gt;* (The script reads the stylesheet which *must* be
-located together with the script). If including the script from html, remember the *type="module"* attribute:
+which will define the custom element *&lt;compare-images/&gt;*. If including the script from html,
+remember the *type="module"* attribute:
 
     <script src="webcomponent/compare-images.js" type="module"></script>
 

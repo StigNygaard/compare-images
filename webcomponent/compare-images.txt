@@ -1,8 +1,7 @@
 <compare-images/> webcomponent
 
-To use this webcomponent, place compare-images.js and compare-images.css together in the same
-location (the script will read the css file) and include the script as a module in your
-webpage/project. If including the script module from html, remember the type-attribute. Like:
+To use this webcomponent include the script as a module in your webpage/project.
+If including the script module from html, remember the type-attribute. Like:
 
 <script src="webcomponent/compare-images.js" type="module"></script>
 
