@@ -40,11 +40,13 @@ class CompareImages extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
+        const stylesheet = new CSSStyleSheet();
+        stylesheet.replaceSync(this.#styling);
+        this.shadowRoot.adoptedStyleSheets = [stylesheet];
     }
 
     // Fires when an instance was inserted into the document
     connectedCallback() {
-        this.shadowRoot.appendChild(cr('style', {}, this.#styling));
         this.#init();
     }
 
@@ -53,7 +55,7 @@ class CompareImages extends HTMLElement {
         if (this.shadowRoot) {
             this.shadowRoot.replaceChildren();
         }
-        // TODO: Full "un-init" incl. removal of event listeners (refactor of constructor, connectedCallback & disconnectedCallback)
+        // TODO: "un-init" should remove event listeners (refactor of constructor, connectedCallback & disconnectedCallback)
     }
 
     static get observedAttributes() {
@@ -174,7 +176,7 @@ class CompareImages extends HTMLElement {
 
         function markDragEnd() {
             dragStart = false;
-            getDragHandle().classList.remove('dragging');
+            getDragHandle()?.classList.remove('dragging');
         }
 
         function isDragStart() {
@@ -261,7 +263,7 @@ class CompareImages extends HTMLElement {
         }
         
         .image-split:hover .draghandle {
-            opacity: 1;
+            opacity: 1 !important;
         }
         .image-split .draghandle:after {
             /* The orange knob  */

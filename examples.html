@@ -12,19 +12,43 @@
             max-width: 100vmin;
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let compareElement = document.getElementsByTagName('compare-images')?.item(0);
+            document.getElementById('insert')?.addEventListener('click', () => {
+                if (document.getElementById('comparing').children.length === 0 && compareElement) {
+                    document.getElementById('comparing').appendChild(compareElement);
+                }
+            });
+            document.getElementById('remove')?.addEventListener('click', () => {
+                if (document.getElementById('comparing').children.length > 0) {
+                    document.getElementById('comparing').removeChild(compareElement);
+                }
+            });
+        })
+    </script>
 </head>
-<body>
 
+<body>
 <main>
     <h1>Examples</h1>
 
-    <compare-images>
-        <img src="https://live.staticflickr.com/5752/20853002160_69e86ab616_k.jpg" alt="first image in comparison">
-        <img src="https://live.staticflickr.com/6195/6035942305_f4d7aeeb1a_k.jpg" alt="second image in comparison">
-    </compare-images>
+    <div>
+        <button id="insert">Insert</button>
+        <button id="remove">Remove</button>
+    </div>
 
     <p>...</p>
-</main>
 
+    <div id="comparing">
+        <compare-images>
+            <img src="https://live.staticflickr.com/5752/20853002160_69e86ab616_k.jpg" alt="first image in comparison">
+            <img src="https://live.staticflickr.com/6195/6035942305_f4d7aeeb1a_k.jpg" alt="second image in comparison">
+        </compare-images>
+    </div>
+
+    <p>...</p>
+
+</main>
 </body>
 </html>
