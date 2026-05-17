@@ -41,21 +41,19 @@ class CompareImages extends HTMLElement {
         super();
         this.attachShadow({mode: 'open'});
         const stylesheet = new CSSStyleSheet();
-        stylesheet.replaceSync(this.#styling);
+        stylesheet.replaceSync(styling);
         this.shadowRoot.adoptedStyleSheets = [stylesheet];
+        this.#build();
     }
 
     // Fires when an instance was inserted into the document
     connectedCallback() {
-        this.#init();
+        this.#splitOperator.bindEvents()
     }
 
     // Fires when an instance was removed from the document
     disconnectedCallback() {
-        if (this.shadowRoot) {
-            this.shadowRoot.replaceChildren();
-        }
-        // TODO: "un-init" should remove event listeners (refactor of constructor, connectedCallback & disconnectedCallback)
+        this.#splitOperator.unbindEvents()
     }
 
     static get observedAttributes() {
@@ -72,7 +70,7 @@ class CompareImages extends HTMLElement {
         console.warn('adoptedCallback: element is moved to a new document!');
     }
 
-    #init() {
+    #build(host = this) {
         const skeleton = cr('div', {'class': 'image-split'},
             cr('slot', {'class': 'part left', 'name': 'left'}),
             cr('slot', {'class': 'part right', 'name': 'right'}),
@@ -92,58 +90,88 @@ class CompareImages extends HTMLElement {
         const leftImage = leftPart.assignedElements()[0];
         const rightImage = rightPart.assignedElements()[0];
         if (leftImage && rightImage) {
-            this.#splitOperator(this, leftImage, rightImage);
+            this.#splitOperator.init(host, leftImage, rightImage);
         } else {
-            console.error('compare-images: Error in declaration of images to compare');
+            console.error('compare-images: Error in declaration of images to compare (#build())');
         }
     }
 
-    #splitOperator(host, leftImage, rightImage) {
+    #splitOperator = (function () {
+        let _dragStart = false;
+        let _host;
+        let _root;
+        let _leftPart;
+        let _leftImage;
+        let _container;
 
-        let dragStart = false;
-        const root = host.shadowRoot;
-        const leftPart = root?.querySelector('.part.left');
-        const container = root?.querySelector('.image-split')
-        if (root) {
-            createHandle();
-            bindEvents();
+        return {
+            init: init,
+            bindEvents: bindEvents,
+            unbindEvents: unbindEvents
         }
 
-        function createHandle() {
-            container.appendChild(cr('div', {class: 'draghandle', draggable: true}));
+        function init(host, leftImage, rightImage) {
+            _host = host;
+            _leftImage = leftImage;
+            _root = _host.shadowRoot;
+            _leftPart = _root?.querySelector('.part.left');
+            _container = _root?.querySelector('.image-split')
+            if (_root && _container) {
+                _container.appendChild(cr('div', {class: 'draghandle', draggable: true}));
+            } else {
+                console.error('compare-images: Error in declaration of images to compare (#splitOperator.init())');
+            }
         }
 
+        function startHandler(e) { // pointerdown?
+            e.preventDefault();
+            e.stopPropagation();
+            markDragStart();
+        }
+        function moveHandler(e) { // pointermove?
+            if (isDragStart()) {
+                const moveX = e.type === 'touchmove' ? e.changedTouches[0].clientX : e.clientX;
+                update(moveX);
+            }
+        }
+        function endHandler() { // pointerup/pointercancel/pointerout/pointerleave?
+            markDragEnd();
+        }
         function bindEvents() {
-            function startHandler(e) { // pointerdown?
-                e.preventDefault();
-                e.stopPropagation();
-                markDragStart();
-            }
-            function moveHandler(e) { // pointermove?
-                if (isDragStart()) {
-                    const moveX = e.type === 'touchmove' ? e.changedTouches[0].clientX : e.clientX;
-                    update(moveX);
-                }
-            }
-            function endHandler() { // pointerup/pointercancel/pointerout/pointerleave?
-                markDragEnd();
-            }
             const dragHandle = getDragHandle();
-            dragHandle.addEventListener('mousedown', startHandler, false);
-            dragHandle.addEventListener('touchstart', startHandler, false);
-            container.addEventListener('mousemove', moveHandler, false);
-            container.addEventListener('touchmove', moveHandler, false);
-            document.addEventListener('mouseup', endHandler, false);
-            document.addEventListener('touchend', endHandler, false);
-            document.addEventListener('touchcancel', endHandler, false);
+            if (dragHandle) {
+                dragHandle.addEventListener('mousedown', startHandler, false);
+                dragHandle.addEventListener('touchstart', startHandler, false);
+                _container.addEventListener('mousemove', moveHandler, false);
+                _container.addEventListener('touchmove', moveHandler, false);
+                document.addEventListener('mouseup', endHandler, false);
+                document.addEventListener('touchend', endHandler, false);
+                document.addEventListener('touchcancel', endHandler, false);
+            } else {
+                console.error('compare-images: Error, no dragHandle in bindEvents()');
+            }
+        }
+        function unbindEvents() {
+            const dragHandle = getDragHandle();
+            if (dragHandle) {
+                dragHandle.removeEventListener('mousedown', startHandler, false);
+                dragHandle.removeEventListener('touchstart', startHandler, false);
+                _container.removeEventListener('mousemove', moveHandler, false);
+                _container.removeEventListener('touchmove', moveHandler, false);
+                document.removeEventListener('mouseup', endHandler, false);
+                document.removeEventListener('touchend', endHandler, false);
+                document.removeEventListener('touchcancel', endHandler, false);
+            } else {
+                console.error('compare-images: Error, no dragHandle in unbindEvents()');
+            }
         }
 
         function getDragHandle() {
-            return root.querySelector('.draghandle');
+            return _root.querySelector('.draghandle');
         }
 
         function getPositionByOffset(offsetX) {
-            const prePosition = (offsetX - host.getBoundingClientRect().left) * 100 / container.offsetWidth;
+            const prePosition = (offsetX - _host.getBoundingClientRect().left) * 100 / _container.offsetWidth;
             if (prePosition < 0) {
                 return 0;
             } else if (prePosition > 100) {
@@ -165,137 +193,137 @@ class CompareImages extends HTMLElement {
 
         function updateLeftPart(position) {
             const translateValue = 100 - position;
-            leftPart.style.transform = `translate(${-translateValue}%)`;
-            leftImage.style.transform = `translate(${translateValue}%)`;
+            _leftPart.style.transform = `translate(${-translateValue}%)`;
+            _leftImage.style.transform = `translate(${translateValue}%)`;
         }
 
         function markDragStart() {
-            dragStart = true;
+            _dragStart = true;
             getDragHandle().classList.add('dragging');
         }
 
         function markDragEnd() {
-            dragStart = false;
+            _dragStart = false;
             getDragHandle()?.classList.remove('dragging');
         }
 
         function isDragStart() {
-            return dragStart === true;
+            return _dragStart === true;
         }
-
-    }
-
-
-    //language=CSS
-    #styling = String.raw`
-        :host {
-            --inactive-handle-opacity: 1;
-            --split-value: 50%;
-            display: block; /* By default, custom elements are "inline" */
-            position: relative;
-            contain: layout style; /* https://developer.chrome.com/blog/css-containment/ */
-            container-type: inline-size;
-            color: rgb(34 34 34);
-            margin: 0;
-            padding: 0 !important;
-        }
-        @media (pointer: fine) { /* fine = mouse (coarse = touch screen) */
-            :host {
-                --inactive-handle-opacity: 0.2;
-            }
-        }
-        :host([hidden]) {
-            display: none;
-        }
-        
-        .image-split {
-            position: relative;
-            max-width: fit-content;
-            display: inline-block;
-            vertical-align: top;
-            user-select: none;
-            clip-path: inset(0 -30px 0 -30px); /* avoid triggering :hover far left of element, but reserve space for draghandle */
-        }
-        .image-split .unnamed {
-            display: none;
-        }
-        .image-split .part {
-            display: block;
-        }
-        .image-split .part.left {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            transform: translate(calc(var(--split-value) * -1));
-        }
-        .image-split ::slotted(img) {
-            max-width: 100%;
-            height: auto;
-            display: block;
-        }
-        .image-split .part.left::slotted(img) {
-            transform: translate(var(--split-value));
-        }
-        .image-split .draghandle {
-            /* The line separator */
-            position: absolute;
-            left: calc(100% - var(--split-value));
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            margin-left: -2px;
-            background-color: rgb(0 0 0 / 0.2);
-            cursor: ew-resize;
-            opacity: var(--inactive-handle-opacity);
-            transition: opacity 0.4s ease-in-out;
-            animation: show 2000ms 2000ms ease-in-out none; /* animation 'show' is an initial hint about the drag-handle for desktop/mouse users */
-        }
-        @keyframes show {
-            50% {
-                opacity: 1;
-            }
-            100% {
-                opacity: var(--inactive-handle-opacity);
-            }
-        }
-        
-        .image-split:hover .draghandle {
-            opacity: 1 !important;
-        }
-        .image-split .draghandle:after {
-            /* The orange knob  */
-            position: absolute;
-            top: 50%;
-            width: 48px;
-            height: 48px;
-            margin: -24px 0 0 -24px;
-        
-            content: "\21d4";
-            color: white;
-            font-weight: bold;
-            font-size: 32px;
-            text-align: center;
-            line-height: 43px;
-        
-            background-color: #ffb800; /* @orange */
-            border: 1px solid #e6a600; /* darken(@orange, 5%) */
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgb(0 0 0 / 0.3), inset 0 2px 0 rgb(255 255 255 / 0.5), inset 0 60px 50px -30px #ffd466; /* lighten(@orange, 20%)*/
-        }
-        .image-split .dragging:after {
-            width: 36px;
-            height: 36px;
-            margin: -18px 0 0 -18px;
-            line-height: 32px;
-            font-size: 28px;
-        }
-    `;
+    })();
 
 }
+
+
+
+//language=CSS
+const styling = String.raw`
+    :host {
+        --inactive-handle-opacity: 1;
+        --split-value: 50%;
+        display: block; /* By default, custom elements are "inline" */
+        position: relative;
+        contain: layout style; /* https://developer.chrome.com/blog/css-containment/ */
+        container-type: inline-size;
+        color: rgb(34 34 34);
+        margin: 0;
+        padding: 0 !important;
+    }
+    @media (pointer: fine) { /* fine = mouse (coarse = touch screen) */
+        :host {
+            --inactive-handle-opacity: 0.2;
+        }
+    }
+    :host([hidden]) {
+        display: none;
+    }
+    
+    .image-split {
+        position: relative;
+        max-width: fit-content;
+        display: inline-block;
+        vertical-align: top;
+        user-select: none;
+        clip-path: inset(0 -30px 0 -30px); /* avoid triggering :hover far left of element, but reserve space for draghandle */
+    }
+    .image-split .unnamed {
+        display: none;
+    }
+    .image-split .part {
+        display: block;
+    }
+    .image-split .part.left {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        transform: translate(calc(var(--split-value) * -1));
+    }
+    .image-split ::slotted(img) {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+    .image-split .part.left::slotted(img) {
+        transform: translate(var(--split-value));
+    }
+    .image-split .draghandle {
+        /* The line separator */
+        position: absolute;
+        left: calc(100% - var(--split-value));
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        margin-left: -2px;
+        background-color: rgb(0 0 0 / 0.2);
+        cursor: ew-resize;
+        opacity: var(--inactive-handle-opacity);
+        transition: opacity 0.4s ease-in-out;
+        animation: show 2000ms 2000ms ease-in-out none; /* animation 'show' is an initial hint about the drag-handle for desktop/mouse users */
+    }
+    @keyframes show {
+        50% {
+            opacity: 1;
+        }
+        100% {
+            opacity: var(--inactive-handle-opacity);
+        }
+    }
+    
+    .image-split:hover .draghandle {
+        opacity: 1 !important;
+    }
+    .image-split .draghandle:after {
+        /* The orange knob  */
+        position: absolute;
+        top: 50%;
+        width: 48px;
+        height: 48px;
+        margin: -24px 0 0 -24px;
+    
+        content: "\21d4";
+        color: white;
+        font-weight: bold;
+        font-size: 32px;
+        text-align: center;
+        line-height: 43px;
+    
+        background-color: #ffb800; /* @orange */
+        border: 1px solid #e6a600; /* darken(@orange, 5%) */
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgb(0 0 0 / 0.3), inset 0 2px 0 rgb(255 255 255 / 0.5), inset 0 60px 50px -30px #ffd466; /* lighten(@orange, 20%)*/
+    }
+    .image-split .dragging:after {
+        width: 36px;
+        height: 36px;
+        margin: -18px 0 0 -18px;
+        line-height: 32px;
+        font-size: 28px;
+    }
+`;
 
 
 // Register custom element...
