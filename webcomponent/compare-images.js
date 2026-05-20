@@ -10,8 +10,8 @@ const LOG = false;
  * Creates an HTML element with the specified tag name, attributes, and content.
  *
  * @param {string} tagName - The tag name of the element to create.
- * @param {object} attributes - An object containing the attributes to set on the element.
- * @param {...(string | Node)} content - Content to be added to the element. Can be strings and Node objects.
+ * @param {object} [attributes] - An object containing the attributes to set on the element.
+ * @param [content] - Content to be added to the element. Can be a mix of Nodes/Elements and strings.
  * @returns {HTMLElement} - The created HTML element.
  */
 function cr(tagName, attributes = {}, ...content) {
